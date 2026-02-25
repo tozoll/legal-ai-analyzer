@@ -1,0 +1,32 @@
+services:
+  lexai:
+    image: lexai:latest          # "make build" ile oluştur
+    # build: .                   # image yoksa doğrudan build etmek için açabilirsin
+    container_name: lexai
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"              # host:container — nginx arkasında 127.0.0.1:3000 yap
+
+    env_file:
+      - .env.production          # .env.production.example dosyasından kopyala ve doldur
+
+    volumes:
+      - lexai_data:/app/data     # kullanıcı hesapları burada kalıcı olarak saklanır
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  lexai_data:
+    driver: local

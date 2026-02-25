@@ -1,0 +1,32 @@
+# Bağımlılıklar ve build çıktıları — Docker içinde yeniden oluşturulacak
+node_modules
+.next
+
+# Ortam ve gizli dosyalar — asla imaja dahil etme
+.env
+.env.local
+.env*.local
+.env.production
+
+# Kullanıcı verisi — volume ile mount edilecek
+data/
+
+# Geliştirme araçları
+.git
+.gitignore
+.eslintrc*
+eslint.config.*
+*.log
+npm-debug.log*
+
+# IDE ve sistem dosyaları
+.DS_Store
+.vscode
+.idea
+Thumbs.db
+
+# Dağıtım araçları — imaja gerek yok
+Makefile
+*.tar.gz
+*.sh
+deploy/

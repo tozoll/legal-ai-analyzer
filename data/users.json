@@ -1,0 +1,10 @@
+{
+  "users": [
+    {
+      "username": "test_kullanici",
+      "passwordHash": "JDJiJDEyJE1yakEzM0s3TWoxR05jdy43azdzOE9Pb2FjVTVON3p3UnFBL1dKc0kyUVpTQUI2dExNNXVl",
+      "role": "user",
+      "createdAt": "2026-02-25T09:58:10.720Z"
+    }
+  ]
+}
