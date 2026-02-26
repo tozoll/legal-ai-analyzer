@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Scale, Brain, Zap, Shield, ArrowDown, Sparkles, FileText,
-  CheckCircle, RotateCcw, ChevronRight, LogOut, Users
+  CheckCircle, RotateCcw, ChevronRight, LogOut, Users, ClipboardList
 } from "lucide-react";
 import { UploadZone } from "@/components/UploadZone";
 import { AnalysisProgress } from "@/components/AnalysisProgress";
@@ -162,6 +162,16 @@ export default function Home() {
               >
                 <Users style={{ height: "14px", width: "14px" }} />
                 Kullanıcılar
+              </button>
+              <button
+                onClick={() => router.push("/logs")}
+                title="Analiz Logları"
+                style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(51,65,85,0.4)", border: "1px solid rgba(51,65,85,0.6)", borderRadius: "10px", padding: "6px 12px", color: "#94a3b8", fontSize: "0.75rem", cursor: "pointer", transition: "all 0.2s ease" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(124,58,237,0.15)"; (e.currentTarget as HTMLButtonElement).style.color = "#c4b5fd"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(124,58,237,0.35)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(51,65,85,0.4)"; (e.currentTarget as HTMLButtonElement).style.color = "#94a3b8"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(51,65,85,0.6)"; }}
+              >
+                <ClipboardList style={{ height: "14px", width: "14px" }} />
+                Loglar
               </button>
               <button
                 onClick={handleLogout}

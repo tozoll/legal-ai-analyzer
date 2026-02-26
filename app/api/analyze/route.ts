@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeContract } from "@/lib/claude-legal";
+import { appendLog, generateLogId } from "@/lib/logger";
+import { saveUploadedFile } from "@/lib/storage";
+import { verifySessionToken, COOKIE_NAME } from "@/lib/auth";
 
 export const maxDuration = 120; // 2 minutes for long contracts
 
@@ -33,6 +36,14 @@ async function extractTextFromFile(file: File): Promise<string> {
 }
 
 export async function POST(request: NextRequest) {
+  const logId = generateLogId();
+  const timestamp = new Date().toISOString();
+
+  // Resolve current user from session cookie
+  const token = request.cookies.get(COOKIE_NAME)?.value;
+  const session = token ? await verifySessionToken(token) : null;
+  const username = session?.username ?? "anonim";
+
   try {
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json(
@@ -72,6 +83,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Archive the uploaded file
+    let contractArchivePath: string | undefined;
+    try {
+      contractArchivePath = await saveUploadedFile(file, logId);
+    } catch (archiveErr) {
+      console.error("File archiving failed (non-fatal):", archiveErr);
+    }
+
     const contractText = await extractTextFromFile(file);
 
     if (!contractText || contractText.trim().length < 100) {
@@ -89,10 +108,39 @@ export async function POST(request: NextRequest) {
     const partyName = formData.get("party") as string | null;
     const analysis = await analyzeContract(truncatedText, partyName ?? undefined);
 
-    return NextResponse.json({ analysis, characterCount: contractText.length, party: partyName });
+    // Write success log
+    appendLog({
+      id: logId,
+      username,
+      filename: file.name,
+      fileSize: file.size,
+      party: partyName,
+      timestamp,
+      status: "success",
+      contractArchivePath,
+    });
+
+    return NextResponse.json({ analysis, characterCount: contractText.length, party: partyName, logId });
   } catch (error) {
     console.error("Analysis error:", error);
     const message = error instanceof Error ? error.message : "Analysis failed";
+
+    // Write error log
+    try {
+      appendLog({
+        id: logId,
+        username,
+        filename: "bilinmiyor",
+        fileSize: 0,
+        party: null,
+        timestamp,
+        status: "error",
+        errorMessage: message,
+      });
+    } catch (logErr) {
+      console.error("Logging failed:", logErr);
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
